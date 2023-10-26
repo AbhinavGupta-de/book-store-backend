@@ -61,6 +61,48 @@ app.get('/books/:id', async (req, res) => {
 	}
 });
 
+app.put('/books/:id', async (req, res) => {
+	try {
+		if (
+			!req.body.title ||
+			!req.body.author ||
+			!req.body.description ||
+			!req.body.publishedYear
+		) {
+			return res.status(400).json({ message: 'Please fill all required fields' });
+		}
+
+		const { id } = req.params;
+
+		const result = await Book.findByIdAndUpdate(id, req.body);
+
+		if (!result) {
+			return res.status(404).json({ message: 'Book not found' });
+		}
+
+		return res.status(200).json({ message: 'Book updated successfully' });
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
+});
+
+app.delete('/books/:id', async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const result = await Book.findByIdAndDelete(id);
+
+		if (!result) {
+			return res.status(404).json({ message: 'Book not found' });
+		}
+
+		return res.status(200).json({ message: 'Book deleted successfully' });
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ error: error.message });
+	}
+});
+
 dotenv.config();
 let mongodbURI = process.env.MONGODB_URL;
 let PORT = process.env.PORT || 5555;
